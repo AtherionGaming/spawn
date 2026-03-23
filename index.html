@@ -3,43 +3,313 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Metinkő Kalkulátor</title>
+<title>Metinkő Kalkulátor - Atherion Gaming</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
 <style>
 body {
   margin:0;
   font-family:Arial, sans-serif;
+  color:white;
   background-image:url('https://metin2.download/picture/UOIXWBG4d1PsC0Bjiga6EHj4c380szxg/.jpg');
   background-size:cover;
-  color:white;
+  background-position:center;
 }
-.container {
-  height:100vh;
+.overlay {
+  min-height:100vh;
+  background:rgba(0,0,0,0.65);
   display:flex;
   justify-content:center;
   align-items:center;
-  flex-direction:column;
-  gap:40px;
-  background:rgba(0,0,0,0.5);
+  padding:10px;
+}
+.panel {
+  background:linear-gradient(145deg,#1b1b1b,#3d2c2c);
+  border:5px solid #b68f40;
+  border-radius:20px;
+  padding:30px;
+  width:100%;
+  max-width:480px;
+  box-shadow:0 0 50px rgba(255,0,0,0.7),0 0 20px rgba(255,200,0,0.5) inset;
+  text-align:center;
+  background-image: radial-gradient(circle at top left, rgba(255,255,255,0.05), rgba(0,0,0,0.3));
+}
+h1.logo {
+  font-size:36px;
+  font-weight:bold;
+  color:#ffd633;
+  text-shadow:0 0 10px #ff3300,0 0 20px #990000;
+  font-family:'Cinzel', serif;
+  margin-bottom:25px;
+}
+.separator {
+  height:2px;
+  background:linear-gradient(to right,#ffcc33,#ff3300,#ffcc33);
+  margin:15px 0;
+  border-radius:2px;
+}
+.time-panel {
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:10px;
+}
+.time-panel input {
+  width:30%;
+  padding:10px;
+  border-radius:6px;
+  border:2px solid #3a6f9e;
+  background-color:#070d14;
+  color:#00eaff;
+  font-size:16px;
+  text-align:center;
+}
+.time-panel span {
+  font-weight:bold;
+  font-size:18px;
+  line-height:36px;
+  color:#00cfff;
 }
 button {
-  padding:20px 40px;
-  font-size:24px;
-  font-family:'Cinzel';
-  border:none;
+  width:48%;
+  margin-top:15px;
+  margin-right:4%;
+  padding:14px;
+  border-radius:6px;
+  border:2px solid #3a6f9e;
+  font-size:16px;
+  cursor:pointer;
+  background:linear-gradient(to bottom,#ff9900,#cc6600);
+  color:#00eaff;
+  font-weight:bold;
+  box-shadow:0 0 15px #00cfff;
+  transition:0.3s;
+}
+button:last-child { margin-right:0; }
+button:hover { transform:scale(1.05); }
+#visszaszamlalo-bar {
+  margin-top:15px;
+  height:40px;
+  background-color:rgba(34,34,34,0.5);
+  border:3px solid #3a6f9e;
+  border-radius:20px;
+  overflow:hidden;
+  position:relative;
+}
+#visszaFill {
+  height:100%;
+  width:100%;
+  background-color:rgba(46,107,46,0.6);
+  border-radius:20px 0 0 20px;
+  position:relative;
+  z-index:1;
+}
+#visszaText {
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  font-size:18px;
+  color:#00eaff;
+  text-shadow:0 0 6px #00cfff;
+  z-index:2;
+}
+#eredmeny { margin-top:10px; font-size:16px; color:#00cfff; text-shadow:0 0 6px #00cfff; }
+#aktualisIdo { margin-top:10px; font-size:12px; color:#aaa; }
+#modal {
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.85);
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+#modalContent {
+  width:80%;
+  max-width:500px;
+  height:80%;
+  max-height:400px;
+  background:url('https://cdna.artstation.com/p/assets/images/images/015/626/024/large/deiv-calviz-david-villegas-metin-2-sura-deiv-calviz.jpg') no-repeat center center;
+  background-size:cover;
+  display:flex;
+  justify-content:center;
+  align-items:center;
   border-radius:12px;
-  background:#00cfff;
-  color:#001a26;
+  flex-direction:column;
+}
+#modalContent div {
+  background:rgba(0,0,0,0.6);
+  padding:15px 25px;
+  border-radius:10px;
+  text-align:center;
+}
+#modalContent button {
+  margin-top:15px;
+  padding:10px 20px;
+  border:none;
+  border-radius:6px;
+  background:linear-gradient(to bottom,#ff9900,#cc6600);
+  font-weight:bold;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow:0 0 15px #00cfff;
+}
+#modalContent button:hover{ transform:scale(1.05);}
+.back-btn {
+  margin-top:15px;
+  padding:10px 20px;
+  border-radius:6px;
+  border:2px solid #3a6f9e;
+  background:linear-gradient(to bottom,#070d14,#001a26);
+  color:#00eaff;
+  font-weight:bold;
   cursor:pointer;
   transition:0.3s;
 }
-button:hover {transform:scale(1.1);}
+.back-btn:hover{ transform:scale(1.05); }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>Metinkő Kalkulátor</h1>
-  <button onclick="window.location.href='calculator.html'">Megnyitás</button>
+<div class="overlay">
+<div class="panel">
+<h1 class="logo">Metinkő Kalkulátor</h1>
+<label>Dátum:</label>
+<input type="date" id="datum">
+<div class="separator"></div>
+<label>Indítás ideje:</label>
+<div class="time-panel">
+<input type="text" id="ido-ora" maxlength="2"><span>:</span>
+<input type="text" id="ido-perc" maxlength="2"><span>:</span>
+<input type="text" id="ido-mp" maxlength="2">
 </div>
+<label>Respawn idő:</label>
+<div class="time-panel">
+<input type="text" id="resp-ora" maxlength="2"><span>:</span>
+<input type="text" id="resp-perc" maxlength="2"><span>:</span>
+<input type="text" id="resp-mp" maxlength="2">
+</div>
+<button onclick="indit()">Indítás</button>
+<button onclick="stop()">STOP</button>
+<div id="visszaszamlalo-bar">
+  <div id="visszaFill"></div>
+  <div id="visszaText">00:00:00</div>
+</div>
+<div id="eredmeny"></div>
+<div id="aktualisIdo"></div>
+<button class="back-btn" onclick="window.location.href='https://atheriongaming.github.io/index/'">Vissza a főoldalra</button>
+</div>
+</div>
+<div id="modal">
+<div id="modalContent">
+<div id="modalText">Figyelmeztetés!</div>
+<button onclick="closeModal()">OK</button>
+</div>
+</div>
+<audio id="bellSound" src="https://freesound.org/data/previews/341/341695_624378-lq.mp3" preload="auto"></audio>
+
+<script>
+let interval=null;
+let fiveMinAlert=false;
+let fiveMinShown=false;
+let autoRestart=false;
+let totalMs=0;
+let nextSpawn=null;
+
+function beallitMaiDatum(){
+  const ma=new Date();
+  const ev=ma.getFullYear();
+  const honap=String(ma.getMonth()+1).padStart(2,'0');
+  const nap=String(ma.getDate()).padStart(2,'0');
+  document.getElementById("datum").value=`${ev}-${honap}-${nap}`;
+}
+function frissitIdo(){
+  const most=new Date();
+  document.getElementById("aktualisIdo").innerText="Jelenlegi idő: "+most.toLocaleString("hu-HU");
+}
+setInterval(frissitIdo,1000);
+
+function showModal(text,isRespawn=false){
+  const audio = document.getElementById("bellSound");
+  document.getElementById("modalText").innerText=text;
+  const modal = document.getElementById("modal");
+  modal.style.display="flex";
+  modal.dataset.respawn=isRespawn;
+  audio.play();
+}
+function closeModal(){
+  const modal=document.getElementById("modal");
+  modal.style.display="none";
+  const audio=document.getElementById("bellSound");
+  audio.pause(); audio.currentTime=0;
+  if(modal.dataset.respawn==="true" && autoRestart) indit();
+}
+
+function indit(){
+  if(interval) clearInterval(interval);
+  fiveMinShown=false;
+
+  const datum=document.getElementById("datum").value;
+  if(!datum){ document.getElementById("eredmeny").innerText="Adj meg dátumot!"; return; }
+  const [ev, honap, nap]=datum.split("-");
+
+  let idoO=parseInt(document.getElementById("ido-ora").value||0);
+  let idoP=parseInt(document.getElementById("ido-perc").value||0);
+  let idoS=parseInt(document.getElementById("ido-mp").value||0);
+
+  const respO=parseInt(document.getElementById("resp-ora").value||0);
+  const respP=parseInt(document.getElementById("resp-perc").value||0);
+  const respS=parseInt(document.getElementById("resp-mp").value||0);
+  totalMs=(respO*3600+respP*60+respS)*1000;
+  if(totalMs<=0){ document.getElementById("eredmeny").innerText="Adj meg érvényes respawn időt!"; return; }
+
+  const startTime=new Date(ev,honap-1,nap,idoO,idoP,idoS);
+  const now=new Date();
+  let elapsedMs = now-startTime;
+  let cycles = Math.floor(elapsedMs/totalMs);
+  let lastSpawn = new Date(startTime.getTime()+cycles*totalMs);
+  nextSpawn=new Date(lastSpawn.getTime()+totalMs);
+
+  document.getElementById("eredmeny").innerHTML=
+    `Eltelt ciklusok: ${cycles}<br>Utolsó spawn: ${lastSpawn.toLocaleString("hu-HU")}<br>Következő spawn: ${nextSpawn.toLocaleString("hu-HU")}`;
+
+  interval=setInterval(update,100);
+}
+
+function update(){
+  const now=new Date();
+  let diff=nextSpawn-now;
+  const fill=document.getElementById("visszaFill");
+  const text=document.getElementById("visszaText");
+  if(diff<=0){
+    fill.style.width="100%";
+    text.innerText="RESPAWN!";
+    fill.style.backgroundColor="rgba(178,34,34,0.6)";
+    showModal("RESPAWN!",true);
+    clearInterval(interval);
+    return;
+  }
+  const ora=Math.floor(diff/3600000);
+  const perc=Math.floor((diff%3600000)/60000);
+  const mp=Math.floor((diff%60000)/1000);
+  text.innerText=`${String(ora).padStart(2,'0')}:${String(perc).padStart(2,'0')}:${String(mp).padStart(2,'0')}`;
+
+  fill.style.width=(diff/totalMs*100)+"%";
+}
+
+function stop(){
+  if(interval){ clearInterval(interval); interval=null;}
+  document.getElementById("visszaFill").style.width="100%";
+  document.getElementById("visszaText").innerText="00:00:00";
+  document.getElementById("eredmeny").innerText="Számláló leállítva.";
+}
+
+beallitMaiDatum();
+frissitIdo();
+</script>
 </body>
 </html>
