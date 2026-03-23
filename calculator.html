@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Metinkő Kalkulátor</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0;
+  font-family:Arial, sans-serif;
+  background-image:url('https://metin2.download/picture/UOIXWBG4d1PsC0Bjiga6EHj4c380szxg/.jpg');
+  background-size:cover;
+  color:white;
+}
+.header {
+  text-align:center;
+  font-family:'Cinzel';
+  font-size:48px;
+  color:#00cfff;
+  text-shadow:0 0 30px #00cfff;
+  margin-top:20px;
+}
+.container {
+  max-width:500px;
+  margin:30px auto;
+  background:rgba(0,0,0,0.6);
+  padding:25px;
+  border-radius:12px;
+}
+label {
+  display:block;
+  margin-top:15px;
+}
+input[type="text"], input[type="date"] {
+  width:30%;
+  padding:8px;
+  border-radius:6px;
+  border:2px solid #00cfff;
+  margin-right:5px;
+  text-align:center;
+  background:#001a26;
+  color:#00eaff;
+  font-family:'Cinzel';
+}
+button {
+  margin-top:15px;
+  padding:12px 20px;
+  font-family:'Cinzel';
+  font-size:16px;
+  border:none;
+  border-radius:6px;
+  background:#00cfff;
+  color:#001a26;
+  cursor:pointer;
+  transition:0.3s;
+}
+button:hover {transform:scale(1.05);}
+#visszaszamlalo-bar {
+  margin-top:15px;
+  height:35px;
+  background-color:rgba(34,34,34,0.5);
+  border:2px solid #00cfff;
+  border-radius:12px;
+  position:relative;
+}
+#visszaFill {
+  height:100%;
+  width:100%;
+  background-color:rgba(46,107,46,0.6);
+  border-radius:12px 0 0 12px;
+  position:absolute;
+}
+#visszaText {
+  position:absolute;
+  top:0; left:0;
+  width:100%;
+  height:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+  color:#fff;
+}
+#eredmeny { margin-top:10px; font-size:16px; color:#ffcc33; }
+</style>
+</head>
+<body>
+<div class="header">Metinkő Kalkulátor</div>
+<div class="container">
+  <button onclick="window.location.href='index.html'">Vissza a főoldalra</button>
+
+  <label>Dátum:</label>
+  <input type="date" id="datum">
+
+  <label>Indítás ideje:</label>
+  <input type="text" id="ido-ora" maxlength="2"> :
+  <input type="text" id="ido-perc" maxlength="2"> :
+  <input type="text" id="ido-mp" maxlength="2">
+
+  <label>Respawn idő:</label>
+  <input type="text" id="resp-ora" maxlength="2"> :
+  <input type="text" id="resp-perc" maxlength="2"> :
+  <input type="text" id="resp-mp" maxlength="2">
+
+  <button onclick="indit()">Indítás</button>
+  <button onclick="stop()">STOP</button>
+
+  <div id="visszaszamlalo-bar">
+    <div id="visszaFill"></div>
+    <div id="visszaText">00:00:00</div>
+  </div>
+  <div id="eredmeny"></div>
+</div>
+
+<script>
+let interval=null;
+let totalMs=0;
+let nextSpawn=null;
+
+function beallitMaiDatum(){
+  const ma=new Date();
+  const ev=ma.getFullYear();
+  const honap=String(ma.getMonth()+1).padStart(2,'0');
+  const nap=String(ma.getDate()).padStart(2,'0');
+  document.getElementById("datum").value=`${ev}-${honap}-${nap}`;
+}
+
+function indit(){
+  if(interval) clearInterval(interval);
+
+  const datum=document.getElementById("datum").value;
+  if(!datum){ document.getElementById("eredmeny").innerText="Adj meg dátumot!"; return; }
+  const [ev, honap, nap]=datum.split("-");
+
+  let idoO=parseInt(document.getElementById("ido-ora").value||0);
+  let idoP=parseInt(document.getElementById("ido-perc").value||0);
+  let idoS=parseInt(document.getElementById("ido-mp").value||0);
+
+  const respO=parseInt(document.getElementById("resp-ora").value||0);
+  const respP=parseInt(document.getElementById("resp-perc").value||0);
+  const respS=parseInt(document.getElementById("resp-mp").value||0);
+  totalMs=(respO*3600+respP*60+respS)*1000;
+  if(totalMs<=0){ document.getElementById("eredmeny").innerText="Adj meg érvényes respawn időt!"; return; }
+
+  const startTime=new Date(ev,honap-1,nap,idoO,idoP,idoS);
+  const now=new Date();
+  let elapsedMs = now-startTime;
+  let cycles = Math.floor(elapsedMs/totalMs);
+  let lastSpawn = new Date(startTime.getTime()+cycles*totalMs);
+  nextSpawn=new Date(lastSpawn.getTime()+totalMs);
+
+  document.getElementById("eredmeny").innerHTML=
+    `Eltelt ciklusok: ${cycles}<br>Utolsó spawn: ${lastSpawn.toLocaleString()}<br>Következő spawn: ${nextSpawn.toLocaleString()}`;
+
+  interval=setInterval(update,100);
+}
+
+function update(){
+  const now=new Date();
+  let diff=nextSpawn-now;
+  const fill=document.getElementById("visszaFill");
+  const text=document.getElementById("visszaText");
+  if(diff<=0){
+    fill.style.width="100%";
+    text.innerText="RESPAWN!";
+    clearInterval(interval);
+    return;
+  }
+  const ora=Math.floor(diff/3600000);
+  const perc=Math.floor((diff%3600000)/60000);
+  const mp=Math.floor((diff%60000)/1000);
+  text.innerText=`${String(ora).padStart(2,'0')}:${String(perc).padStart(2,'0')}:${String(mp).padStart(2,'0')}`;
+  fill.style.width=(diff/totalMs*100)+"%";
+}
+
+function stop(){
+  if(interval){ clearInterval(interval); interval=null;}
+  document.getElementById("visszaFill").style.width="100%";
+  document.getElementById("visszaText").innerText="00:00:00";
+  document.getElementById("eredmeny").innerText="Számláló leállítva.";
+}
+
+beallitMaiDatum();
+</script>
+</body>
+</html>
